@@ -61,6 +61,9 @@ class Config:
     
     # Create logs directory if it doesn't exist
     os.makedirs(os.path.join(base_dir, 'logs'), exist_ok=True)
+    
+    # Memory Monitoring Configuration
+    ENABLE_MEMORY_MONITORING = os.getenv('ENABLE_MEMORY_MONITORING', 'false').lower() == 'true'
 
 
 class TestConfig(Config):
@@ -82,6 +85,9 @@ class DevelopmentConfig(Config):
     # Allow insecure cookies for local development (HTTP)
     SESSION_COOKIE_SECURE = False
     REMEMBER_COOKIE_SECURE = False
+    
+    # Enable memory monitoring in development
+    ENABLE_MEMORY_MONITORING = True
 
 
 class ProductionConfig(Config):

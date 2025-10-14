@@ -7,16 +7,20 @@ from app.main import bp
 from app import db
 from app.models import Client, Project, Invoice
 from app.models.project_models import InvoiceStatus
+from app.utils.memory_monitor import monitor_memory_usage
 
 
 @bp.route('/')
+@monitor_memory_usage("Index Load")
 def index():
     if current_user.is_authenticated:
         return redirect(url_for('main.dashboard'))
+    current_app.logger.info('Index route called')
     return render_template('index.html')
 
 @bp.route('/dashboard')
 @login_required
+@monitor_memory_usage("Dashboard Load")
 def dashboard():
     current_app.logger.info('Dashboard route called')
     

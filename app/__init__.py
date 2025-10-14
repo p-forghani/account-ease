@@ -56,14 +56,25 @@ def create_app(
 
     app.logger.setLevel(getattr(logging, app.config['LOG_LEVEL']))
     app.logger.info('ClientEase startup')
+    
+    # Set up memory monitoring
+    if app.config.get('ENABLE_MEMORY_MONITORING', False):
+        from app.utils.memory_monitor import setup_memory_monitoring_middleware, MemoryMonitor
+        setup_memory_monitoring_middleware(app)
+        
+        # Log initial memory usage
+        monitor = MemoryMonitor(app.logger)
+        monitor.log_memory_usage('App Startup')
+        app.logger.info('Memory monitoring enabled')
 
     db.init_app(app)
     migrate.init_app(app, db)
     login.init_app(app)
     
     # Register CLI commands (import here to avoid circular imports)
-    from app.commands import seed_db
+    from app.commands import seed_db, memory_check
     app.cli.add_command(seed_db)
+    app.cli.add_command(memory_check)
 
     # Test database connection at startup
     with app.app_context():
