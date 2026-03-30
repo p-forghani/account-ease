@@ -1,15 +1,39 @@
 import sqlalchemy as sa
-from flask import current_app, flash, redirect, render_template, url_for, request
-from flask_login import current_user, login_required, login_user, logout_user
+
+from flask import (
+    current_app,
+    flash,
+    redirect,
+    render_template,
+    url_for,
+    request,
+)
+from flask_login import (
+    current_user,
+    login_required,
+    login_user,
+    logout_user,
+)
 
 from app import db
 from app.auth import bp
-from app.auth.auth_emails import (send_reset_password_email,
-                                  send_verification_email)
-from app.auth.auth_forms import (ForgotPasswordForm, LoginForm,
-                                 RegistrationForm, ResetPasswordForm)
+from app.auth.auth_emails import (
+    send_reset_password_email,
+    send_verification_email,
+)
+from app.auth.auth_forms import (
+    ForgotPasswordForm,
+    LoginForm,
+    RegistrationForm,
+    ResetPasswordForm,
+)
 from app.models import User
-from app.utils.logger import log_info, log_warning, log_security_event, log_user_action
+from app.utils.logger import (
+    log_info,
+    log_warning,
+    log_security_event,
+    log_user_action,
+)
 
 
 @bp.route('/login', methods=['GET', 'POST'])
