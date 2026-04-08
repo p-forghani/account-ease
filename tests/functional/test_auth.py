@@ -11,8 +11,8 @@ def test_register(client):
             'first_name': 'test name',
             'last_name': 'test lastname',
             'email': 't@g.com',
-            'password': 'testpassword',
-            'confirm_password': 'testpassword',
+            'password': 'Testpassword1',
+            'confirm_password': 'Testpassword1',
         }
     )
     assert response_post.status_code == 302
