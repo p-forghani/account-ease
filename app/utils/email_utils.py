@@ -25,6 +25,12 @@ class EmailClient:
             
         configuration = sib_api_v3_sdk.Configuration()
         configuration.api_key['api-key'] = self.api_key
+        proxy = (
+            os.environ.get('HTTP_PROXY')
+        )
+        if proxy:
+            configuration.proxy = proxy  # type: ignore[assignment]
+            logger.info("EmailClient: using proxy %s", proxy)
         self.api_client = sib_api_v3_sdk.ApiClient(configuration)
         self.api_instance = sib_api_v3_sdk.TransactionalEmailsApi(self.api_client)
         logger.info("EmailClient initialized successfully")
