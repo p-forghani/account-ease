@@ -19,6 +19,7 @@ def create_app(
     if os.getenv('FLASK_ENV') == 'development'
     else ProductionConfig
 ):
+    '''Create and configure the Flask application'''
     app = Flask(__name__, static_folder='static')
     app.config.from_object(config_class)
 
@@ -76,19 +77,20 @@ def create_app(
     app.cli.add_command(seed_db)
     app.cli.add_command(memory_check)
 
-    # Test database connection at startup
+    # Test database connection at startup; ensure reference data for roles
     with app.app_context():
         try:
-            # Try to execute a simple query to test connection
             with db.engine.connect() as connection:
                 connection.execute(db.text('SELECT 1'))
-            app.logger.info('Database connection successful')
         except Exception as e:
             app.logger.error(f'Database connection failed: {e}')
             raise RuntimeError(
                 f"Failed to connect to PostgreSQL database: {e}. "
                 "Please check your DATABASE_URL configuration."
             ) from e
+        app.logger.info('Database connection successful')
+        from app.commands import ensure_default_roles
+        ensure_default_roles()
 
     from app.admin import bp as admin_bp
     from app.auth import bp as auth_bp

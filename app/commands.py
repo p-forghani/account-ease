@@ -1,31 +1,44 @@
 import click
 from flask.cli import with_appcontext
 from flask import current_app
+from sqlalchemy import inspect as sa_inspect
+
 from app import db
 from app.models import Role
 from app.utils.memory_monitor import MemoryMonitor
 
-@click.command("seed-db")
-@with_appcontext
-def seed_db():
-    """Seed the database with initial data."""
-    roles = [
-        {"id": 1, "name": "Admin", "description": "Admin role"},
-        {"id": 2, "name": "User", "description": "User role"},
-        {"id": 3, "name": "Customer", "description": "Customer role"}]
+DEFAULT_ROLES = [
+    {"id": 1, "name": "Admin", "description": "Admin role"},
+    {"id": 2, "name": "User", "description": "User role"},
+    {"id": 3, "name": "Customer", "description": "Customer role"},
+]
 
-    for role in roles:
+
+def ensure_default_roles() -> None:
+    """
+    Ensure Admin / User / Customer roles exist.
+
+    Idempotent. No-op if the roles table is missing (e.g. before migrations).
+    """
+    if not sa_inspect(db.engine).has_table("roles"):
+        return
+    for role in DEFAULT_ROLES:
         if not Role.query.filter_by(name=role["name"]).first():
             db.session.add(
                 Role(
                     id=role["id"],
                     name=role["name"],
-                    description=role["description"]
+                    description=role["description"],
                 )
             )
-
-
     db.session.commit()
+
+
+@click.command("seed-db")
+@with_appcontext
+def seed_db():
+    """Seed the database with initial data."""
+    ensure_default_roles()
     click.echo("✅ Database roles seeded successfully!")
 
 

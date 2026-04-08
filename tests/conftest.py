@@ -9,6 +9,8 @@ def app():
     app = create_app(config_class=TestConfig)
     with app.app_context():
         db.create_all()
+        from app.commands import ensure_default_roles
+        ensure_default_roles()
         yield app
         db.session.remove()
         db.drop_all()
